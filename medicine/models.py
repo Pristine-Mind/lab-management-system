@@ -12,7 +12,7 @@ class Medicine(models.Model):
 
 
 class Batch(models.Model):
-    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name='batches')
+    medicine = models.ForeignKey(Medicine, on_delete=models.CASCADE, related_name="batches")
     batch_number = models.CharField(max_length=255)
     expiry_date = models.DateField()
     quantity = models.PositiveIntegerField()  # Available quantity
@@ -29,7 +29,7 @@ class Batch(models.Model):
 class Bill(models.Model):
     date = models.DateTimeField(auto_now_add=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
- 
+
     def __str__(self):
         return f"Bill #{self.id} - {self.date}"
 
@@ -43,7 +43,9 @@ class BillItem(models.Model):
     def clean(self):
         # Ensure the requested quantity is available
         if self.quantity > self.batch.quantity:
-            raise ValidationError(f"Not enough stock available for {self.batch.medicine.name} - {self.batch.batch_number}. Available quantity: {self.batch.quantity}")
+            raise ValidationError(
+                f"Not enough stock available for {self.batch.medicine.name} - {self.batch.batch_number}. Available quantity: {self.batch.quantity}"
+            )
 
     def save(self, *args, **kwargs):
         self.clean()

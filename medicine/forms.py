@@ -5,13 +5,13 @@ from .models import Medicine, Batch, Bill
 class MedicineForm(forms.ModelForm):
     class Meta:
         model = Medicine
-        fields = ['name', 'description', 'price']
+        fields = ["name", "description", "price"]
 
 
 class BatchForm(forms.ModelForm):
     class Meta:
         model = Batch
-        fields = ['medicine', 'batch_number', 'expiry_date', 'quantity']
+        fields = ["medicine", "batch_number", "expiry_date", "quantity"]
 
 
 class BillForm(forms.ModelForm):
@@ -25,11 +25,11 @@ class ReplenishStockForm(forms.ModelForm):
 
     class Meta:
         model = Batch
-        fields = ['added_quantity']
+        fields = ["added_quantity"]
 
     def save(self, commit=True):
         batch = super().save(commit=False)
-        batch.quantity += self.cleaned_data['added_quantity']
+        batch.quantity += self.cleaned_data["added_quantity"]
         if commit:
             batch.save()
         return batch
