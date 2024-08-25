@@ -3,14 +3,40 @@
 {% block title %}Add Batch{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-6 offset-md-3">
-        <h2 class="text-center">Add New Batch</h2>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit" class="btn btn-primary mt-3">Save Batch</button>
-        </form>
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <h2 class="text-center mb-4">Add New Batch</h2>
+            <form method="POST" class="p-4 border rounded shadow-sm">
+                {% csrf_token %}
+                {{ form.non_field_errors }}
+                {% for field in form %}
+                    <div class="form-group mb-3">
+                        <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                        {{ field }}
+                        {{ field.errors }}
+                    </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-primary mt-3">Save Batch</button>
+            </form>
+            {% if success_message %}
+                <div class="alert alert-success mt-3">{{ success_message }}</div>
+            {% endif %}
+        </div>
     </div>
 </div>
+
+<style>
+    .form-control {
+        border-radius: 0.25rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    .form-group label {
+        font-weight: bold;
+    }
+    .alert {
+        font-size: 1.1rem;
+    }
+</style>
+
 {% endblock %}

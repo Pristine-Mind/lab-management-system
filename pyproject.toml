@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "bus-ticket"
+name = "pharmacy-management"
 version = "0.1.0"
 description = ""
 authors = ["pristine-dev <info@pristine-minds.com>"]

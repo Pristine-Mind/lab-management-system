@@ -12,6 +12,9 @@ class BatchForm(forms.ModelForm):
     class Meta:
         model = Batch
         fields = ["medicine", "batch_number", "expiry_date", "quantity"]
+        widgets = {
+            "expiry_date": forms.widgets.DateInput(attrs={'type': 'date'})
+        }
 
 
 class BillForm(forms.ModelForm):
