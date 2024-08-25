@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Batch List{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">Batch List</h2>
+    
+    {% if batches %}
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Medicine Name</th>
+                <th>Batch Number</th>
+                <th>Expiry Date</th>
+                <th>Available Quantity</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for batch in batches %}
+            <tr>
+                <td>{{ batch.medicine.name }}</td>
+                <td>{{ batch.batch_number }}</td>
+                <td>{{ batch.expiry_date }}</td>
+                <td>{{ batch.quantity }}</td>
+                <td>
+                    <a href="{% url 'replenish_stock' batch.id %}" class="btn btn-warning btn-sm">Replenish</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p class="text-center">No batches available.</p>
+    {% endif %}
+</div>
+{% endblock %}

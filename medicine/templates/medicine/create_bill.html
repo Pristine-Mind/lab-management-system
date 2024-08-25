@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+
+{% block title %}Create Bill{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Create Bill</h2>
+
+    <!-- Display messages -->
+    {% if messages %}
+        <div class="alert alert-info">
+            <ul>
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    {% endif %}
+
+    <form method="POST">
+        {% csrf_token %}
+        {{ form.as_p }}
+
+        <div id="batch-fields">
+            <div class="row">
+                <div class="col-md-5">
+                    <label for="batch">Batch</label>
+                    <select name="batch" class="form-control" required>
+                        {% for batch in batches %}
+                            <option value="{{ batch.id }}">{{ batch.medicine.name }} - {{ batch.batch_number }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="col-md-5">
+                    <label for="quantity">Quantity</label>
+                    <input type="number" name="quantity" class="form-control" required>
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-success mt-4" onclick="addBatchField()">Add</button>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="btn btn-primary mt-3">Create Bill</button>
+    </form>
+</div>
+
+<script>
+function addBatchField() {
+    const container = document.getElementById('batch-fields');
+    const newField = document.createElement('div');
+    newField.classList.add('row');
+    newField.innerHTML = `
+        <div class="col-md-5">
+            <label for="batch">Batch</label>
+            <select name="batch" class="form-control" required>
+                {% for batch in batches %}
+                    <option value="{{ batch.id }}">{{ batch.medicine.name }} - {{ batch.batch_number }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-5">
+            <label for="quantity">Quantity</label>
+            <input type="number" name="quantity" class="form-control" required>
+        </div>
+        <div class="col-md-2">
+            <button type="button" class="btn btn-danger mt-4" onclick="this.parentElement.parentElement.remove()">Remove</button>
+        </div>
+    `;
+    container.appendChild(newField);
+}
+</script>
+{% endblock %}

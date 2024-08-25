@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Batch{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <h2 class="text-center">Add New Batch</h2>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit" class="btn btn-primary mt-3">Save Batch</button>
+        </form>
+    </div>
+</div>
+{% endblock %}
