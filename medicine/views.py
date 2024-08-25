@@ -1,4 +1,12 @@
+import pdfkit
+
+from django.core.exceptions import ValidationError
+from django.contrib import messages
+from django.http import HttpResponse
+from django.template.loader import get_template
+from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
+
 from .models import (
     Batch,
     Bill,
@@ -11,12 +19,6 @@ from .forms import (
     BillForm,
     ReplenishStockForm,
 )
-from django.core.exceptions import ValidationError
-from django.contrib import messages
-from django.http import HttpResponse
-from django.template.loader import get_template
-from django.db import models
-import pdfkit
 
 
 # View to add medicine
@@ -44,7 +46,7 @@ def add_batch(request):
 
 
 def create_bill(request):
-    batches = Batch.objects.filter(quantity__gt=0)  # Only show batches with available stock
+    batches = Batch.objects.filter(quantity__gt=0)
 
     if request.method == "POST":
         form = BillForm(request.POST)
@@ -63,9 +65,8 @@ def create_bill(request):
                     if quantity > batch.quantity:
                         low_stock_items.append(batch)
                     else:
-                        price = batch.medicine.price  # Assuming price is a field on Medicine
+                        price = batch.medicine.price
                         total_amount += price * quantity
-                print(low_stock_items, "items")
                 if low_stock_items:
                     # If there are low stock items, show a message and don't save the bill
                     low_stock_items_str = ", ".join([batch.medicine.name for batch in low_stock_items])
@@ -81,9 +82,9 @@ def create_bill(request):
                         quantity = int(quantity)
                         price = batch.medicine.price
                         bill_item = BillItem(bill=bill, batch=batch, quantity=quantity, price=price)
-                        bill_item.save()  # This will trigger validation and stock deduction
+                        bill_item.save()
 
-                    return redirect("print_bill", pk=bill.pk)  # Redirect to the PDF view
+                    return redirect("print_bill", pk=bill.pk)
 
             except ValidationError as e:
                 messages.error(request, e.message)
@@ -113,7 +114,7 @@ def replenish_stock(request, batch_id):
             form.instance = batch
             form.save()
             messages.success(request, f"Successfully replenished stock for {batch.medicine.name} - {batch.batch_number}.")
-            return redirect("batch_list")  # Replace 'batch_list' with your actual URL name
+            return redirect("batch_list")
     else:
         form = ReplenishStockForm()
 
