@@ -21,17 +21,26 @@
                         <th>Batch Number</th>
                         <th>Quantity</th>
                         <th>Price</th>
+                        <th>Amount</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {% for item in bill.billitem_set.all %}
-                    <tr>
-                        <td>{{ item.batch.medicine.name }}</td>
-                        <td>{{ item.batch.batch_number }}</td>
-                        <td>{{ item.quantity }}</td>
-                        <td>{{ item.price }}</td>
-                    </tr>
-                    {% endfor %}
+                    {% load medicine_extras %}
+                    {% if bill.billitem_set.all %}
+                        {% for item in bill.billitem_set.all %}
+                        <tr>
+                            <td>{{ item.batch.medicine.name }}</td>
+                            <td>{{ item.batch.batch_number }}</td>
+                            <td>{{ item.quantity }}</td>
+                            <td>{{ item.price }}</td>
+                            <td>{{ item.quantity | multiply:item.price }}</td>
+                        </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">No medicine items found.</td>
+                        </tr>
+                    {% endif %}
                 </tbody>
             </table>
             <h4>Total Amount: <strong>{{ bill.total_amount }}</strong></h4>
@@ -39,3 +48,4 @@
     </div>
 </body>
 </html>
+

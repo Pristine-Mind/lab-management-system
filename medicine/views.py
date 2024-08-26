@@ -6,7 +6,6 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
-from django.db import transaction
 
 from .models import (
     Batch,
@@ -20,6 +19,7 @@ from .forms import (
     BillForm,
     ReplenishStockForm,
 )
+from .templatetags.medicine_extras import multiply
 
 
 # View to add medicine
@@ -52,53 +52,43 @@ def create_bill(request):
     if request.method == "POST":
         form = BillForm(request.POST)
         if form.is_valid():
+            total_amount = 0
             batch_ids = request.POST.getlist("batch")
             quantities = request.POST.getlist("quantity")
 
-        try:
-            with transaction.atomic():
-                # Fetch all batches at once
-                batches = {batch.id: batch for batch in Batch.objects.filter(id__in=batch_ids).select_related("medicine")}
+            low_stock_items = []
 
-                low_stock_items = []
-                total_amount = 0
-                low_stock_found = False
-
+            try:
+                # Check stock levels before creating the bill
                 for batch_id, quantity in zip(batch_ids, quantities):
-                    batch = batches[batch_id]
+                    batch = Batch.objects.get(id=batch_id)
+                    quantity = int(quantity)
                     if quantity > batch.quantity:
-                        low_stock_found = True
                         low_stock_items.append(batch)
                     else:
                         price = batch.medicine.price
                         total_amount += price * quantity
-
-                if low_stock_found:
+                if low_stock_items:
+                    # If there are low stock items, show a message and don't save the bill
                     low_stock_items_str = ", ".join([batch.medicine.name for batch in low_stock_items])
                     messages.error(request, f"Low stock for items: {low_stock_items_str}. Please adjust quantities.")
                 else:
+                    # No low stock items, proceed to save the bill
                     bill = form.save(commit=False)
                     bill.total_amount = total_amount
                     bill.save()
 
-                    # Create bill items in bulk
-                    bill_items = [
-                        BillItem(
-                            bill=bill, batch=batches[batch_id], quantity=quantity, price=batches[batch_id].medicine.price
-                        )
-                        for batch_id, quantity in zip(batch_ids, quantities)
-                    ]
-                    BillItem.objects.bulk_create(bill_items)
-
-                    # Update batch quantities
                     for batch_id, quantity in zip(batch_ids, quantities):
-                        batches[batch_id].quantity -= quantity
-                        batches[batch_id].save()
+                        batch = Batch.objects.get(id=batch_id)
+                        quantity = int(quantity)
+                        price = batch.medicine.price
+                        bill_item = BillItem(bill=bill, batch=batch, quantity=quantity, price=price)
+                        bill_item.save()
 
-                    return redirect("print_bill", pk=bill.pk)
+                    return redirect("bill_pdf", pk=bill.pk)
 
-        except ValidationError as e:
-            messages.error(request, e.message)
+            except ValidationError as e:
+                messages.error(request, e.message)
 
     else:
         form = BillForm()
