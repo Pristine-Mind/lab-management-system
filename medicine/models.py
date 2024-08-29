@@ -18,6 +18,10 @@ class Medicine(models.Model):
         choices=MedicineType.choices,
         default=MedicineType.TABLET
     )
+    distributor_name = models.CharField(
+        verbose_name="Name of distributor",
+        max_length=255
+    )
 
     def __str__(self):
         return self.name

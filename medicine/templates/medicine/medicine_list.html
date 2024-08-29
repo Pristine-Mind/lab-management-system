@@ -15,13 +15,14 @@
         </form>
 
         {% if page_obj %}
-        <table class="table table-hover">
+        <table class="table table-bordered table-hover">
             <thead>
                 <tr>
                     <th>Name</th>
                     <th>Description</th>
                     <th>Price</th>
                     <th>Type</th>
+                    <th>Distributor Name</th>
                 </tr>
             </thead>
             <tbody>
@@ -31,6 +32,7 @@
                     <td>{{ medicine.description }}</td>
                     <td>{{ medicine.price }}</td>
                     <td>{{ medicine.medicine_type }}</td>
+                    <td>{{ medicine.distributor_name }}</td>
                 </tr>
                 {% endfor %}
             </tbody>
