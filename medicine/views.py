@@ -129,8 +129,8 @@ def low_stock_alerts(request):
 
 
 def stock_dashboard(request):
-    total_medicines = Medicine.objects.count()
-    total_batches = Batch.objects.count()
+    total_medicines = Medicine.objects.values('name').distinct().count()
+    total_batches = Batch.objects.values('batch_number').distinct().count()
     total_stock = Batch.objects.aggregate(models.Sum("quantity"))["quantity__sum"]
     low_stock_batches = Batch.objects.filter(quantity__lte=Batch.LOW_STOCK_THRESHOLD)
     context = {
