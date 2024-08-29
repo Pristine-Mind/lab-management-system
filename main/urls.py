@@ -22,5 +22,6 @@ from medicine.views import stock_dashboard
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("medicine/", include("medicine.urls")),
-    path("", stock_dashboard, name="stock_dashboard")
+    path("", stock_dashboard, name="stock_dashboard"),
+    path('', include('pwa.urls')),
 ]
