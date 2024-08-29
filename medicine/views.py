@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 from .models import (
     Batch,
@@ -19,7 +21,6 @@ from .forms import (
     BillForm,
     ReplenishStockForm,
 )
-from .templatetags.medicine_extras import multiply
 
 
 # View to add medicine
@@ -142,8 +143,19 @@ def stock_dashboard(request):
 
 
 def medicine_list(request):
-    medicines = Medicine.objects.all()
-    return render(request, "medicine/medicine_list.html", {"medicines": medicines})
+    query = request.GET.get('q')
+    if query:
+        medicines = Medicine.objects.filter(
+            Q(name__icontains=query)
+        )
+    else:
+        medicines = Medicine.objects.all()
+
+    paginator = Paginator(medicines, 10)  # Show 10 medicines per page
+    page_number = request.GET.get('page')
+    page_obj = paginator.get_page(page_number)
+
+    return render(request, "medicine/medicine_list.html", {"page_obj": page_obj, "query": query})
 
 
 def batch_list(request):
