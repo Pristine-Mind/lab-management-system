@@ -23,6 +23,7 @@ ipython = "*"
 factory-boy = "*"
 uwsgi = "*"
 pdfkit = "*"
+django-pwa = "*"
 
 [tool.poetry.dev-dependencies]
 pytest = "*"

@@ -35,6 +35,7 @@ class Command(BaseCommand):
                     medicine=medicine,
                     batch_number=fake.uuid4(),
                     expiry_date=fake.date_between(start_date="today", end_date="+2y"),
+                    manufactured_date=fake.date_between(start_date="-2y", end_date="today"),
                     quantity=random.randint(20, 100),
                 )
                 batches.append(batch)
