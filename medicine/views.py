@@ -143,19 +143,33 @@ def stock_dashboard(request):
 
 
 def medicine_list(request):
-    query = request.GET.get('q')
+    query = request.GET.get("q", None)
     if query:
-        medicines = Medicine.objects.filter(
-            Q(name__icontains=query)
-        )
+        medicines = Medicine.objects.filter(Q(name__icontains=query))
     else:
         medicines = Medicine.objects.all()
 
-    paginator = Paginator(medicines, 10)  # Show 10 medicines per page
-    page_number = request.GET.get('page')
+    paginator = Paginator(medicines, 10)
+    page_number = request.GET.get("page", None)
     page_obj = paginator.get_page(page_number)
 
-    return render(request, "medicine/medicine_list.html", {"page_obj": page_obj, "query": query})
+    # Handle form submission
+    if request.method == "POST":
+        form = MedicineForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("medicine_list")
+    else:
+        form = MedicineForm()
+
+    return render(
+        request,
+        "medicine/medicine_list.html",
+        {
+            "page_obj": page_obj,
+            "form": form,
+        },
+    )
 
 
 def batch_list(request):
