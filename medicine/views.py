@@ -6,6 +6,8 @@ from django.http import HttpResponse
 from django.template.loader import get_template
 from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
+from django.core.paginator import Paginator
+from django.db.models import Q
 
 from .models import (
     Batch,
@@ -19,7 +21,6 @@ from .forms import (
     BillForm,
     ReplenishStockForm,
 )
-from .templatetags.medicine_extras import multiply
 
 
 # View to add medicine
@@ -128,8 +129,8 @@ def low_stock_alerts(request):
 
 
 def stock_dashboard(request):
-    total_medicines = Medicine.objects.count()
-    total_batches = Batch.objects.count()
+    total_medicines = Medicine.objects.values('name').distinct().count()
+    total_batches = Batch.objects.values('batch_number').distinct().count()
     total_stock = Batch.objects.aggregate(models.Sum("quantity"))["quantity__sum"]
     low_stock_batches = Batch.objects.filter(quantity__lte=Batch.LOW_STOCK_THRESHOLD)
     context = {
@@ -142,8 +143,33 @@ def stock_dashboard(request):
 
 
 def medicine_list(request):
-    medicines = Medicine.objects.all()
-    return render(request, "medicine/medicine_list.html", {"medicines": medicines})
+    query = request.GET.get("q", None)
+    if query:
+        medicines = Medicine.objects.filter(Q(name__icontains=query))
+    else:
+        medicines = Medicine.objects.all()
+
+    paginator = Paginator(medicines, 10)
+    page_number = request.GET.get("page", None)
+    page_obj = paginator.get_page(page_number)
+
+    # Handle form submission
+    if request.method == "POST":
+        form = MedicineForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect("medicine_list")
+    else:
+        form = MedicineForm()
+
+    return render(
+        request,
+        "medicine/medicine_list.html",
+        {
+            "page_obj": page_obj,
+            "form": form,
+        },
+    )
 
 
 def batch_list(request):

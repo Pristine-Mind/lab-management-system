@@ -26,6 +26,16 @@
     </div>
 </div>
 
+<!-- Initialize Select2 for the medicine field -->
+<script>
+    $(document).ready(function() {
+        $('#id_medicine').select2({
+            placeholder: 'Search for a medicine',
+            allowClear: true
+        });
+    });
+</script>
+
 <style>
     .form-control {
         border-radius: 0.25rem;
