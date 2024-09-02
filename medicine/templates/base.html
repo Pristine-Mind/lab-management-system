@@ -28,11 +28,16 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item"><a class="nav-link" href="{% url 'add_batch' %}">Add Batch</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'create_bill' %}">Create Bill</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'stock_dashboard' %}">Dashboard</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'medicine_list' %}">List Medicine</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{% url 'batch_list' %}">List Medicine Batches</a></li>
+                    {% if user.is_authenticated %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'add_batch' %}">Add Batch</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'create_bill' %}">Create Bill</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'stock_dashboard' %}">Dashboard</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'medicine_list' %}">List Medicine</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'batch_list' %}">List Medicine Batches</a></li>
+                        <li class="nav-item"><a class="nav-link" href="{% url 'logout' %}">Logout</a></li>
+                    {% else %}
+                        <li class="nav-item"><a class="nav-link" href="{% url 'login' %}">Login</a></li>
+                    {% endif %}
                 </ul>
             </div>
         </div>
