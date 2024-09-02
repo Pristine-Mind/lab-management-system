@@ -140,8 +140,8 @@ def low_stock_alerts(request):
 
 @login_required
 def stock_dashboard(request):
-    total_medicines = Medicine.objects.values('name').distinct().count()
-    total_batches = Batch.objects.values('batch_number').distinct().count()
+    total_medicines = Medicine.objects.values("name").distinct().count()
+    total_batches = Batch.objects.values("batch_number").distinct().count()
     total_stock = Batch.objects.aggregate(models.Sum("quantity"))["quantity__sum"]
     low_stock_batches = Batch.objects.filter(quantity__lte=Batch.LOW_STOCK_THRESHOLD)
     context = {
@@ -191,28 +191,28 @@ def batch_list(request):
 
 
 class LoginView(View):
-    template_name = 'login.html'
+    template_name = "login.html"
     form_class = AuthenticationForm
     success_url = reverse_lazy(settings.LOGIN_REDIRECT_URL)
 
     def get(self, request):
         form = self.form_class()
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {"form": form})
 
     def post(self, request):
         form = self.form_class(data=request.POST)
         if form.is_valid():
-            username = form.cleaned_data.get('username')
-            password = form.cleaned_data.get('password')
+            username = form.cleaned_data.get("username")
+            password = form.cleaned_data.get("password")
             user = authenticate(username=username, password=password)
             if user is not None:
                 login(request, user)
                 return redirect(settings.LOGIN_REDIRECT_URL)
-        return render(request, self.template_name, {'form': form})
+        return render(request, self.template_name, {"form": form})
 
 
 class LogoutView(View):
 
     def get(self, request):
         logout(request)
-        return redirect('login')
+        return redirect("login")

@@ -13,8 +13,8 @@ class BatchForm(forms.ModelForm):
         model = Batch
         fields = ["medicine", "batch_number", "expiry_date", "quantity", "manufactured_date"]
         widgets = {
-            "expiry_date": forms.widgets.DateInput(attrs={'type': 'date'}),
-            "manufactured_date": forms.widgets.DateInput(attrs={'type': 'date'})
+            "expiry_date": forms.widgets.DateInput(attrs={"type": "date"}),
+            "manufactured_date": forms.widgets.DateInput(attrs={"type": "date"}),
         }
 
     def clean(self):

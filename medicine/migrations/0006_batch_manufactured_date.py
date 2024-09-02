@@ -7,13 +7,13 @@ import django.utils.timezone
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('medicine', '0005_medicine_distributor_name'),
+        ("medicine", "0005_medicine_distributor_name"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='batch',
-            name='manufactured_date',
+            model_name="batch",
+            name="manufactured_date",
             field=models.DateField(default=django.utils.timezone.now),
             preserve_default=False,
         ),

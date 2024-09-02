@@ -6,14 +6,14 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('medicine', '0006_batch_manufactured_date'),
+        ("medicine", "0006_batch_manufactured_date"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='billitem',
-            name='customer_name',
-            field=models.CharField(default='nepal', max_length=255, verbose_name='Customer Name'),
+            model_name="billitem",
+            name="customer_name",
+            field=models.CharField(default="nepal", max_length=255, verbose_name="Customer Name"),
             preserve_default=False,
         ),
     ]
