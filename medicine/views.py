@@ -8,6 +8,13 @@ from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q
+from django.shortcuts import render, redirect
+from django.contrib.auth import authenticate, login, logout
+from django.views import View
+from django.contrib.auth.forms import AuthenticationForm
+from django.urls import reverse_lazy
+from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 from .models import (
     Batch,
@@ -23,7 +30,7 @@ from .forms import (
 )
 
 
-# View to add medicine
+@login_required
 def add_medicine(request):
     if request.method == "POST":
         form = MedicineForm(request.POST)
@@ -35,7 +42,7 @@ def add_medicine(request):
     return render(request, "medicine/add_medicine.html", {"form": form})
 
 
-# View to add batch
+@login_required
 def add_batch(request):
     if request.method == "POST":
         form = BatchForm(request.POST)
@@ -47,6 +54,7 @@ def add_batch(request):
     return render(request, "medicine/add_batch.html", {"form": form})
 
 
+@login_required
 def create_bill(request):
     batches = Batch.objects.filter(quantity__gt=0)
 
@@ -97,7 +105,7 @@ def create_bill(request):
     return render(request, "medicine/create_bill.html", {"form": form, "batches": batches})
 
 
-# View to print bill
+@login_required
 def print_bill(request, pk):
     bill = Bill.objects.get(pk=pk)
     template = get_template("medicine/bill_pdf.html")
@@ -108,6 +116,7 @@ def print_bill(request, pk):
     return response
 
 
+@login_required
 def replenish_stock(request, batch_id):
     batch = get_object_or_404(Batch, id=batch_id)
     if request.method == "POST":
@@ -123,11 +132,13 @@ def replenish_stock(request, batch_id):
     return render(request, "medicine/replenish_stock.html", {"form": form, "batch": batch})
 
 
+@login_required
 def low_stock_alerts(request):
     low_stock_batches = Batch.objects.filter(quantity__lte=Batch.LOW_STOCK_THRESHOLD)
     return render(request, "medicine/low_stock_alerts.html", {"low_stock_batches": low_stock_batches})
 
 
+@login_required
 def stock_dashboard(request):
     total_medicines = Medicine.objects.values('name').distinct().count()
     total_batches = Batch.objects.values('batch_number').distinct().count()
@@ -142,6 +153,7 @@ def stock_dashboard(request):
     return render(request, "medicine/stock_dashboard.html", context)
 
 
+@login_required
 def medicine_list(request):
     query = request.GET.get("q", None)
     if query:
@@ -172,6 +184,35 @@ def medicine_list(request):
     )
 
 
+@login_required
 def batch_list(request):
     batches = Batch.objects.all()
     return render(request, "medicine/batch_list.html", {"batches": batches})
+
+
+class LoginView(View):
+    template_name = 'login.html'
+    form_class = AuthenticationForm
+    success_url = reverse_lazy(settings.LOGIN_REDIRECT_URL)
+
+    def get(self, request):
+        form = self.form_class()
+        return render(request, self.template_name, {'form': form})
+
+    def post(self, request):
+        form = self.form_class(data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect(settings.LOGIN_REDIRECT_URL)
+        return render(request, self.template_name, {'form': form})
+
+
+class LogoutView(View):
+
+    def get(self, request):
+        logout(request)
+        return redirect('login')

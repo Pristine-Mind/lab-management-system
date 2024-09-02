@@ -31,10 +31,14 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
 
   web:
     <<: *base_server_setup
     ports:
       - 8000:8000
     command: python manage.py runserver 0.0.0.0:8000
-  
+
+volumes:
+  postgres_data:

@@ -248,3 +248,6 @@ PWA_APP_SCREENSHOTS = [
         "type": "image/png"
     }
 ]
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'stock_dashboard'

@@ -18,10 +18,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from medicine.views import stock_dashboard
+from medicine.views import LoginView, LogoutView
 
 urlpatterns = [
     path("admin/", admin.site.urls),
     path("medicine/", include("medicine.urls")),
     path("", stock_dashboard, name="stock_dashboard"),
     path('', include('pwa.urls')),
+    path('login/', LoginView.as_view(), name='login'),
+    path('logout/', LogoutView.as_view(), name='logout'),
 ]
