@@ -6,13 +6,18 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('medicine', '0003_medicine_price'),
+        ("medicine", "0003_medicine_price"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='medicine',
-            name='medicine_type',
-            field=models.CharField(choices=[('surgical', 'Surgical'), ('tablet', 'Tablet'), ('syrup', 'Suryp'), ('ointment', 'Ointment')], default='tablet', max_length=100, verbose_name='Medicine Type'),
+            model_name="medicine",
+            name="medicine_type",
+            field=models.CharField(
+                choices=[("surgical", "Surgical"), ("tablet", "Tablet"), ("syrup", "Suryp"), ("ointment", "Ointment")],
+                default="tablet",
+                max_length=100,
+                verbose_name="Medicine Type",
+            ),
         ),
     ]

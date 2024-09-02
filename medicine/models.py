@@ -4,24 +4,18 @@ from django.core.exceptions import ValidationError
 
 class Medicine(models.Model):
     class MedicineType(models.TextChoices):
-        SURGICAL = 'surgical', 'Surgical'
-        TABLET = 'tablet', 'Tablet'
-        SYRUP = 'syrup', 'Suryp'
-        OINTMENT = 'ointment', 'Ointment'
+        SURGICAL = "surgical", "Surgical"
+        TABLET = "tablet", "Tablet"
+        SYRUP = "syrup", "Suryp"
+        OINTMENT = "ointment", "Ointment"
 
     name = models.CharField(max_length=200)
     description = models.TextField(blank=True, null=True)
     price = models.DecimalField(max_digits=10, decimal_places=2, blank=True, null=True)
     medicine_type = models.CharField(
-        verbose_name='Medicine Type',
-        max_length=100,
-        choices=MedicineType.choices,
-        default=MedicineType.TABLET
+        verbose_name="Medicine Type", max_length=100, choices=MedicineType.choices, default=MedicineType.TABLET
     )
-    distributor_name = models.CharField(
-        verbose_name="Name of distributor",
-        max_length=255
-    )
+    distributor_name = models.CharField(verbose_name="Name of distributor", max_length=255)
 
     def __str__(self):
         return self.name
