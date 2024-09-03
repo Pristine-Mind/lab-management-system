@@ -8,7 +8,7 @@
 
     <!-- Display messages -->
     {% if messages %}
-        <div class="alert alert-info">
+        <div class="alert alert-danger">
             <ul>
                 {% for message in messages %}
                     <li>{{ message }}</li>
@@ -24,12 +24,10 @@
         <div id="batch-fields">
             <div class="row">
                 <div class="col-md-5">
-                    <label for="batch">Batch</label>
-                    <select name="batch" class="form-control" required>
-                        {% for batch in batches %}
-                            <option value="{{ batch.id }}">{{ batch.medicine.name }} - {{ batch.batch_number }}</option>
-                        {% endfor %}
-                    </select>
+                    <label for="batch_search">Batch</label>
+                    <input type="text" id="batch_search" class="form-control" placeholder="Search batch..." onkeyup="searchBatch(this)" required>
+                    <div id="batch_results" class="list-group mt-2" style="display:none;"></div>
+                    <input type="hidden" name="batch" id="selected_batch_id">
                 </div>
                 <div class="col-md-5">
                     <label for="quantity">Quantity</label>
@@ -46,18 +44,50 @@
 </div>
 
 <script>
+function searchBatch(input) {
+    const query = input.value;
+    const resultsDiv = document.getElementById('batch_results');
+    const selectedBatchIdInput = document.getElementById('selected_batch_id');
+
+    if (query.length < 2) {
+        resultsDiv.style.display = 'none';
+        return;
+    }
+
+    fetch(`/medicine/search_batch/?q=${query}`)
+        .then(response => response.json())
+        .then(data => {
+            resultsDiv.innerHTML = '';
+            if (data.batches.length > 0) {
+                data.batches.forEach(batch => {
+                    const option = document.createElement('a');
+                    option.classList.add('list-group-item', 'list-group-item-action');
+                    option.textContent = `${batch.medicine_name} - ${batch.batch_number}`;
+                    option.href = '#';
+                    option.onclick = () => {
+                        input.value = `${batch.medicine_name} - ${batch.batch_number}`;
+                        selectedBatchIdInput.value = batch.id;
+                        resultsDiv.style.display = 'none';
+                    };
+                    resultsDiv.appendChild(option);
+                });
+                resultsDiv.style.display = 'block';
+            } else {
+                resultsDiv.style.display = 'none';
+            }
+        });
+}
+
 function addBatchField() {
     const container = document.getElementById('batch-fields');
     const newField = document.createElement('div');
     newField.classList.add('row');
     newField.innerHTML = `
         <div class="col-md-5">
-            <label for="batch">Batch</label>
-            <select name="batch" class="form-control" required>
-                {% for batch in batches %}
-                    <option value="{{ batch.id }}">{{ batch.medicine.name }} - {{ batch.batch_number }}</option>
-                {% endfor %}
-            </select>
+            <label for="batch_search">Batch</label>
+            <input type="text" class="form-control" placeholder="Search batch..." onkeyup="searchBatch(this)" required>
+            <div class="list-group mt-2" style="display:none;"></div>
+            <input type="hidden" name="batch">
         </div>
         <div class="col-md-5">
             <label for="quantity">Quantity</label>

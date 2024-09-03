@@ -8,13 +8,14 @@ from django.db import models
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.paginator import Paginator
 from django.db.models import Q
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
 from django.contrib.auth.forms import AuthenticationForm
 from django.urls import reverse_lazy
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.http import JsonResponse
+from django.views.decorators.http import require_GET
 
 from .models import (
     Batch,
@@ -216,3 +217,23 @@ class LogoutView(View):
     def get(self, request):
         logout(request)
         return redirect("login")
+
+
+@login_required
+@require_GET
+def search_batch(request):
+    query = request.GET.get('q', '')
+    if query:
+        batches = Batch.objects.filter(
+            models.Q(medicine__name__icontains=query) |
+            models.Q(batch_number__icontains=query)).distinct()
+        results = [
+            {
+                'id': batch.id,
+                'medicine_name': batch.medicine.name,
+                'batch_number': batch.batch_number,
+            } for batch in batches
+        ]
+    else:
+        results = []
+    return JsonResponse({'batches': results})
